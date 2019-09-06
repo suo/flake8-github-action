@@ -9,12 +9,10 @@ const checkName = "flake8 lint"
 async function runFlake8() {
   await exec.exec('pip3', ['install', 'flake8']);
   core.addPath('/home/runner/.local/bin');
-  await exec.exec('ls');
 
   let myOutput = '';
   let myError = '';
   let options = {
-      cwd: GITHUB_WORKSPACE,
       listeners: {
           stdout: (data: Buffer) => {
               myOutput += data.toString();
@@ -24,8 +22,7 @@ async function runFlake8() {
           }
       }
   };
-  const flake8Path: string = await io.which('flake8', true)
-  await exec.exec(`"${flake8Path}"`, ['main.py']);
+  await exec.exec('flake8', ['--exit-zero']);
   return myOutput;
 }
 
