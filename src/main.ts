@@ -33,7 +33,7 @@ function parseOutput(output) {
     // Group 3: column number
     // Group 4: error code
     // Group 5: error description
-    let regex = new RegExp(/^(.*?):(\d+):(\d+): (\w\d+) (.*)$/);
+    let regex = new RegExp(/^(.*?):(\d+):(\d+): (\w\d+) ([\s|\w]*)/);
     let errors = output.split('\n');
     let matches : any[] = [];
     for (let i = 0; i < errors.length; i++) {
