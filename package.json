@@ -1,8 +1,8 @@
 {
-  "name": "node12-template-action",
+  "name": "flake8-github-action",
   "version": "0.0.0",
   "private": true,
-  "description": "Node 12 template action",
+  "description": "Run flake 8",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -10,17 +10,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/javascript-template.git"
+    "url": "git+https://github.com/suo/flake8-github-action"
   },
   "keywords": [
     "actions",
-    "node",
+    "python",
+    "flake8",
     "setup"
   ],
-  "author": "GitHub",
+  "author": "suo",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.0.0"
+    "@actions/core": "^1.0.0",
+    "@actions/tool-cache": "^1.0.0",
+    "@actions/exec": "^1.0.0",
+    "request": "*"
   },
   "devDependencies": {
     "@types/jest": "^24.0.13",
