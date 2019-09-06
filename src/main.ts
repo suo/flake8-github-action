@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
+import * as io from '@actions/io';
 
 const { GITHUB_TOKEN } = process.env;
 const checkName = "flake8 lint"
@@ -19,7 +20,8 @@ async function runFlake8() {
           }
       }
   };
-  await exec.exec('flake8', ['--exit-zero'], options);
+  const flake8Path: string = await io.which('flake8', true)
+  await exec.exec(`"${flake8Path}"`, ['main.py']);
   return myOutput;
 }
 
