@@ -9,7 +9,7 @@ const checkName = "flake8 lint"
 async function runFlake8() {
   await exec.exec('pip3', ['install', 'flake8']);
   core.addPath('/home/runner/.local/bin');
-  await exec.exec('tree');
+  await exec.exec('ls');
 
   let myOutput = '';
   let myError = '';
@@ -88,6 +88,8 @@ async function run() {
       if (checkData.conclusion === 'failure') {
         core.setFailed('flake8 failures found');
       }
+        core.setFailed('flake8 failures found');
+
   }
     catch (error) {
       core.setFailed(error.message);
