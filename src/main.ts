@@ -9,6 +9,8 @@ const checkName = "flake8 lint"
 async function runFlake8() {
   await exec.exec('pip3', ['install', 'flake8']);
   core.addPath('/home/runner/.local/bin');
+  await exec.exec('tree');
+
   let myOutput = '';
   let myError = '';
   let options = {
