@@ -27,7 +27,7 @@ async function createCheck() {
     started_at: new Date()
   }
 
-  const { data } = await request(`https://api.github.com/repos/${owner}/${repo}/check-runs`, {
+  const { data } = await request.request(`https://api.github.com/repos/${owner}/${repo}/check-runs`, {
     method: 'POST',
     headers,
     body
@@ -46,7 +46,7 @@ async function updateCheck(id, conclusion, output) {
     output
   }
 
-  await request(`https://api.github.com/repos/${owner}/${repo}/check-runs/${id}`, {
+  await request.request(`https://api.github.com/repos/${owner}/${repo}/check-runs/${id}`, {
     method: 'PATCH',
     headers,
     body
