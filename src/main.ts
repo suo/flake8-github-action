@@ -62,7 +62,6 @@ function parseOutput(output) {
         summary: `${matches.length} error(s) found`,
         matches,
       },
-
     };
 }
 
@@ -72,6 +71,7 @@ async function createCheck(checkData) {
     ...github.context.repo,
     name: checkName,
     head_sha: github.context.sha,
+    status: 'completed',
     ...checkData
   });
 }
@@ -82,6 +82,7 @@ async function run() {
       const myInput = core.getInput('myInput');
       const flake8Output = await runFlake8();
       const checkData = parseOutput(flake8Output);
+      console.log(checkData);
       await createCheck(checkData);
       if (checkData.conclusion === 'failure') {
         core.setFailed('flake8 failures found');
