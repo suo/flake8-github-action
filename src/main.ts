@@ -1,58 +1,9 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
-import * as request from 'request'
+import * as github from '@actions/github';
 
-const { GITHUB_SHA, GITHUB_EVENT_PATH, GITHUB_TOKEN, GITHUB_WORKSPACE } = process.env
-const event = require(String(GITHUB_EVENT_PATH))
-const { repository } = event
-const {
-  owner: { login: owner }
-} = repository
-const { name: repo } = repository
-
-const checkName = 'flake8 lint'
-
-const headers = {
-  'Content-Type': 'application/json',
-  Accept: 'application/vnd.github.antiope-preview+json',
-  Authorization: `Bearer ${GITHUB_TOKEN}`,
-  'User-Agent': 'flake8-action'
-}
-
-async function createCheck() {
-  const body = {
-    name: checkName,
-    head_sha: GITHUB_SHA,
-    status: 'in_progress',
-    started_at: new Date()
-  }
-
-  const { data } = await request(`https://api.github.com/repos/${owner}/${repo}/check-runs`, {
-    method: 'POST',
-    headers,
-    body
-  })
-  const { id } = data
-  return id
-}
-
-async function updateCheck(id, conclusion, output) {
-  const body = {
-    name: checkName,
-    head_sha: GITHUB_SHA,
-    status: 'completed',
-    completed_at: new Date(),
-    conclusion,
-    output
-  }
-
-  await request(`https://api.github.com/repos/${owner}/${repo}/check-runs/${id}`, {
-    method: 'PATCH',
-    headers,
-    body
-  })
-}
-
+const { GITHUB_TOKEN } = process.env;
+const checkName = "flake8 lint"
 
 async function runFlake8() {
   await exec.exec('pip3', ['install', 'flake8']);
@@ -112,16 +63,26 @@ function parseOutput(output) {
     };
 }
 
+async function createCheck(checkData) {
+  const octokit = new github.GitHub(String(GITHUB_TOKEN));
+  await octokit.checks.create({
+    ...github.context.repo,
+    name: checkName,
+    sha: github.context.sha,
+    ...checkData
+  });
+}
+
+
 async function run() {
   try {
-    const id = await createCheck();
       const myInput = core.getInput('myInput');
       const flake8Output = await runFlake8();
-      const { conclusion, output } = parseOutput(flake8Output);
-      await updateCheck(id, conclusion, output)
-        if (conclusion === 'failure') {
-      core.setFailed('flake8 failures found');
-    }
+      const checkData = parseOutput(flake8Output);
+      await createCheck(checkData);
+      if (checkData.conclusion === 'failure') {
+        core.setFailed('flake8 failures found');
+      }
   }
     catch (error) {
       core.setFailed(error.message);
