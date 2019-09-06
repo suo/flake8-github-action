@@ -8,7 +8,7 @@ const checkName = "flake8 lint"
 
 async function runFlake8() {
   await exec.exec('pip3', ['install', 'flake8']);
-  core.addPath('/home/runner/.local/bin/');
+  core.addPath('/home/runner/.local/bin');
   let myOutput = '';
   let myError = '';
   let options = {
@@ -71,7 +71,7 @@ async function createCheck(checkData) {
   await octokit.checks.create({
     ...github.context.repo,
     name: checkName,
-    sha: github.context.sha,
+    head_sha: github.context.sha,
     ...checkData
   });
 }
