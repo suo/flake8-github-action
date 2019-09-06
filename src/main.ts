@@ -3,7 +3,7 @@ import * as exec from '@actions/exec';
 import * as github from '@actions/github';
 import * as io from '@actions/io';
 
-const { GITHUB_TOKEN } = process.env;
+const { GITHUB_TOKEN, GITHUB_WORKSPACE } = process.env;
 const checkName = "flake8 lint"
 
 async function runFlake8() {
@@ -14,6 +14,7 @@ async function runFlake8() {
   let myOutput = '';
   let myError = '';
   let options = {
+      cwd: GITHUB_WORKSPACE,
       listeners: {
           stdout: (data: Buffer) => {
               myOutput += data.toString();
