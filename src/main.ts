@@ -58,7 +58,7 @@ async function createCheck(checkName, annotations) {
     ref: github.context.sha
   });
 
-  console.log(res);
+  console.log(res.data.check_runs[0]);
 
   await octokit.checks.create({
     ...github.context.repo,
