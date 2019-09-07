@@ -3,10 +3,9 @@ import * as exec from '@actions/exec';
 import * as github from '@actions/github';
 
 const { GITHUB_TOKEN } = process.env;
-const checkName = "flake8 lint"
 
 async function runFlake8() {
-  await exec.exec('pip3', ['install', 'flake8']);
+  await exec.exec('pip3 install flake8');
   // XXX: the path pip installs to is not on the PATH by default. So we're
   // adding it to the PATH, but I don't know if this location is stable or not.
   core.addPath('/home/runner/.local/bin');
@@ -19,12 +18,12 @@ async function runFlake8() {
       },
     }
   };
-  await exec.exec('flake8', ['--exit-zero'], options);
+  await exec.exec('flake8 --exit-zero', [], options);
   return myOutput;
 }
 
 // Regex the output for error lines, then format them in
-function parseOutput(output) {
+function parseFlake8Output(output) {
   // Group 0: whole match
   // Group 1: filename
   // Group 2: line number
@@ -56,7 +55,7 @@ function parseOutput(output) {
   return annotations;
 }
 
-async function createCheck(annotations) {
+async function createCheck(checkName, annotations) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
 
   await octokit.checks.create({
@@ -76,9 +75,13 @@ async function createCheck(annotations) {
 
 async function run() {
   try {
+    // Launch flake8
     const flake8Output = await runFlake8();
-    const annotations = parseOutput(flake8Output);
-    await createCheck(annotations);
+    const annotations = parseFlake8Output(flake8Output);
+    await createCheck("flake8 lint", annotations);
+
+    // Launch clangtidy
+    await exec.exec('tools/run-clang-tidy-in-ci.sh');
   }
   catch (error) {
     core.setFailed(error.message);
