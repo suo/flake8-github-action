@@ -87,8 +87,6 @@ async function run() {
       await createCheck(checkName, "flake8 failure", annotations);
       core.setFailed(`${annotations.length} errors(s) found`);
     }
-    // Launch clang-tidy
-    // await exec.exec('tools/run-clang-tidy-in-ci.sh');
   }
   catch (error) {
     core.setFailed(error.message);
