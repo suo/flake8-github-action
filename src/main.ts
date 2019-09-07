@@ -52,7 +52,15 @@ function parseFlake8Output(output) {
 
 async function createCheck(checkName, annotations) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
-  const req : any = {
+  const res = await octokit.checks.listForRef({
+    check_name: 'lint',
+    ...github.context.repo,
+    ref: github.context.sha
+  });
+
+  console.log(res);
+
+  await octokit.checks.create({
     ...github.context.repo,
     name: checkName,
     head_sha: github.context.sha,
@@ -63,19 +71,12 @@ async function createCheck(checkName, annotations) {
       summary: `${annotations.length} errors(s) found`,
       annotations
     }
-  };
-  console.log(req);
-  const res = await octokit.checks.create(req);
-
-  console.log(res);
+  });
 }
 
 
 async function run() {
   try {
-    console.log(`github sha: ${github.context.sha}`);
-    console.log(`github ref: ${github.context.ref}`);
-    console.log(`github event name: ${GITHUB_EVENT_NAME}`)
     // Launch flake8
     const flake8Output = await runFlake8();
     const annotations = parseFlake8Output(flake8Output);
