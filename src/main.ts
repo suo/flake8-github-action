@@ -58,13 +58,11 @@ async function createCheck(checkName, annotations) {
     ref: github.context.sha
   });
 
-  console.log(res.data.check_runs[0]);
+  const check_run_id = res.data.check_runs[0].id;
 
-  await octokit.checks.create({
+  await octokit.checks.update({
     ...github.context.repo,
-    name: checkName,
-    head_sha: github.context.sha,
-    status: 'completed',
+    check_run_id,
     conclusion: annotations.length > 0 ? 'failure' : 'success',
     output: {
       title: checkName,
