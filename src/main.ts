@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
+import { ChecksCreateParams } from '@octokit/rest';
 
 const { GITHUB_TOKEN } = process.env;
 
@@ -52,8 +53,7 @@ function parseFlake8Output(output) {
 
 async function createCheck(checkName, annotations) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
-
-  const res = await octokit.checks.create({
+  const req : any = {
     ...github.context.repo,
     name: checkName,
     head_sha: github.context.sha,
@@ -64,7 +64,9 @@ async function createCheck(checkName, annotations) {
       summary: `${annotations.length} errors(s) found`,
       annotations
     }
-  });
+  };
+  console.log(req);
+  const res = await octokit.checks.create(req);
 
   console.log(res);
 }
