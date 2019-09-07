@@ -77,10 +77,9 @@ async function run() {
     // Launch flake8
     const flake8Output = await runFlake8();
     const annotations = parseFlake8Output(flake8Output);
-    console.log(annotations);
-    await createCheck("flake8 lint", annotations);
-
     if (annotations.length > 0) {
+      console.log(annotations);
+      await createCheck("flake8 failure", annotations);
       core.setFailed(`${annotations.length} errors(s) found`);
     }
     // Launch clang-tidy
