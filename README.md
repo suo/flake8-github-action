@@ -1,9 +1,35 @@
-# JavaScript Action Template
+# `flake8` Github Action
 
-This template offers an easy way to get started writing a JavaScript action with TypeScript compile time support, unit testing with Jest and using the GitHub Actions Toolkit.
+This is a Github Action to run `flake8` against your repository. It uses the new Github Actions API and JavaScript toolkit. It does fancy things like add annotations to your PRs inline.
 
-## Getting Started
+Use it in your project like:
 
-See the walkthrough located [here](https://github.com/actions/toolkit/blob/master/docs/javascript-action.md).
+(in `.github/workflows/lint.yml`)
+```
+name: Lint
 
-In addition to walking your through how to create an action, it also provides strategies for versioning, releasing and referencing your actions.
+on:
+  push:
+    paths:
+      - '*.py'
+
+jobs:
+  flake8_py3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7.4
+          architecture: x64
+      - name: Checkout PyTorch
+        uses: actions/checkout@master
+      - name: Install flake8
+        run: pip install flake8
+      - name: Run flake8
+        uses: suo/flake8-github-action@releases/v1
+        with:
+          checkName: 'flake8_py3'   # NOTE: this needs to be the same as the job name
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
