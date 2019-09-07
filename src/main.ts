@@ -79,9 +79,6 @@ async function run() {
     const flake8Output = await runFlake8();
     const annotations = parseOutput(flake8Output);
     await createCheck(annotations);
-    if (annotations.length > 0) {
-      core.setFailed('flake8 failures found');
-    }
   }
   catch (error) {
     core.setFailed(error.message);
