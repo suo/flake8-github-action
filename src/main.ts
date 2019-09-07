@@ -82,8 +82,8 @@ async function run() {
     console.log(annotations);
     await createCheck("flake8 lint", annotations);
 
-    // Launch clangtidy
-    await exec.exec('tools/run-clang-tidy-in-ci.sh');
+    // Launch clang-tidy
+    // await exec.exec('tools/run-clang-tidy-in-ci.sh');
   }
   catch (error) {
     core.setFailed(error.message);
