@@ -1,8 +1,9 @@
 name: 'Flake8 action'
 description: 'Run flake8 and annotate the results'
 author: 'suo'
-icon: check-circle
-color: yellow
+branding:
+  icon: check-circle
+  color: yellow
 inputs:
   checkName:
     description: 'The name of the check to add annotations to.
