@@ -1,9 +1,8 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
-import { ChecksCreateParams } from '@octokit/rest';
 
-const { GITHUB_TOKEN } = process.env;
+const { GITHUB_TOKEN, GITHUB_EVENT_NAME } = process.env;
 
 async function runFlake8() {
   let myOutput = '';
@@ -74,6 +73,8 @@ async function createCheck(checkName, annotations) {
 
 async function run() {
   try {
+    console.log(`github sha: ${github.context.sha}`);
+    console.log(`github event name: ${GITHUB_EVENT_NAME}`)
     // Launch flake8
     const flake8Output = await runFlake8();
     const annotations = parseFlake8Output(flake8Output);
