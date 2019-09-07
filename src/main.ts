@@ -6,9 +6,6 @@ const { GITHUB_TOKEN } = process.env;
 
 async function runFlake8() {
   await exec.exec('pip3 install flake8');
-  // XXX: the path pip installs to is not on the PATH by default. So we're
-  // adding it to the PATH, but I don't know if this location is stable or not.
-  core.addPath('/home/runner/.local/bin');
 
   let myOutput = '';
   let options = {
