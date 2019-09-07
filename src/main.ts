@@ -63,7 +63,6 @@ async function createCheck(checkName, annotations) {
   await octokit.checks.update({
     ...github.context.repo,
     check_run_id,
-    conclusion: annotations.length > 0 ? 'failure' : 'success',
     output: {
       title: checkName,
       summary: `${annotations.length} errors(s) found`,
@@ -81,6 +80,9 @@ async function run() {
     console.log(annotations);
     await createCheck("flake8 lint", annotations);
 
+    if (annotations.length > 0) {
+      core.setFailed(`${annotations.length} errors(s) found`);
+    }
     // Launch clang-tidy
     // await exec.exec('tools/run-clang-tidy-in-ci.sh');
   }
