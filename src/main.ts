@@ -1,8 +1,9 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
+import * as octokit from '@octokit/rest';
 
-const { GITHUB_TOKEN, GITHUB_EVENT_NAME } = process.env;
+const { GITHUB_TOKEN } = process.env;
 
 async function runFlake8() {
   let myOutput = '';
@@ -17,8 +18,9 @@ async function runFlake8() {
   return myOutput;
 }
 
+type Annotation = octokit.ChecksUpdateParamsOutputAnnotations;
 // Regex the output for error lines, then format them in
-function parseFlake8Output(output) {
+function parseFlake8Output(output: string): Annotation[] {
   // Group 0: whole match
   // Group 1: filename
   // Group 2: line number
@@ -27,33 +29,36 @@ function parseFlake8Output(output) {
   // Group 5: error description
   let regex = new RegExp(/^(.*?):(\d+):(\d+): (\w\d+) ([\s|\w]*)/);
   let errors = output.split('\n');
-  let annotations: any[] = [];
+  let annotations: Annotation[] = [];
   for (let i = 0; i < errors.length; i++) {
     let error = errors[i];
     let match = error.match(regex);
     if (match) {
       // Chop `./` off the front so that Github will recognize the file path
       const normalized_path = match[1].replace('./', '');
-      match = {
+      const line = parseInt(match[2]);
+      const column = parseInt(match[3]);
+      const annotation_level = <const> 'failure';
+      const annotation = {
         path: normalized_path,
-        start_line: match[2],
-        end_line: match[2],
-        start_column: match[3],
-        end_column: match[3],
-        annotation_level: "failure",
+        start_line: line,
+        end_line: line,
+        start_column: column,
+        end_column: column,
+        annotation_level,
         message: `[${match[4]}] ${match[5]}`,
       };
 
-      annotations.push(match);
+      annotations.push(annotation);
     }
   }
   return annotations;
 }
 
-async function createCheck(checkName, annotations) {
+async function createCheck(check_name: string, title: string, annotations: Annotation[]) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
   const res = await octokit.checks.listForRef({
-    check_name: 'lint',
+    check_name,
     ...github.context.repo,
     ref: github.context.sha
   });
@@ -64,13 +69,12 @@ async function createCheck(checkName, annotations) {
     ...github.context.repo,
     check_run_id,
     output: {
-      title: checkName,
+      title,
       summary: `${annotations.length} errors(s) found`,
       annotations
     }
   });
 }
-
 
 async function run() {
   try {
@@ -79,7 +83,8 @@ async function run() {
     const annotations = parseFlake8Output(flake8Output);
     if (annotations.length > 0) {
       console.log(annotations);
-      await createCheck("flake8 failure", annotations);
+      const checkName = core.getInput('checkName');
+      await createCheck(checkName, "flake8 failure", annotations);
       core.setFailed(`${annotations.length} errors(s) found`);
     }
     // Launch clang-tidy

@@ -3,4 +3,10 @@ description: 'Run flake8 and annotate the results'
 author: 'suo'
 runs:
   using: 'node12'
+  inputs:
+    checkName:
+      description: 'The name of the check to add annotations to.
+
+        Generally the same as the job that uses this action'
+      required: true
   main: 'lib/main.js'
