@@ -37,8 +37,10 @@ function parseOutput(output) {
     let error = errors[i];
     let match = error.match(regex);
     if (match) {
+      // Chop `./` off the front so that Github will recognize the file path
+      const normalized_path = match[1].replace('./', '');
       match = {
-        path: match[1],
+        path: normalized_path,
         start_line: match[2],
         end_line: match[2],
         start_column: match[3],
