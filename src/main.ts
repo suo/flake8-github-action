@@ -60,18 +60,17 @@ async function createCheck(annotations) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
   core.setFailed('flake8 failures found');
 
-  const foo = await octokit.checks.listForRef({
+  const res = await octokit.checks.listForRef({
+    check_name: 'lint',
     ...github.context.repo,
     ref: github.context.sha,
   });
-  console.log(foo.data.check_runs[0]);
+  const check_run_id = res.data.check_runs[0].id;
 
-  await octokit.checks.create({
+  await octokit.checks.update({
     ...github.context.repo,
+    check_run_id,
     name: checkName,
-    head_sha: github.context.sha,
-    status: 'completed',
-    conclusion: annotations.length > 0 ? 'failure' : 'success',
     output: {
       title: checkName,
       summary: `${annotations.length} errors(s) found`,
