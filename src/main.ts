@@ -58,20 +58,13 @@ function parseOutput(output) {
 
 async function createCheck(annotations) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
-  core.setFailed('flake8 failures found');
 
-  const res = await octokit.checks.listForRef({
-    check_name: 'lint',
+  await octokit.checks.create({
     ...github.context.repo,
-    ref: github.context.sha,
-  });
-  console.log(res.data.check_runs);
-  const check_run_id = res.data.check_runs[0].id;
-
-  await octokit.checks.update({
-    ...github.context.repo,
-    check_run_id,
     name: checkName,
+    head_sha: github.context.sha,
+    status: 'completed',
+    conclusion: annotations.length > 0 ? 'failure' : 'success',
     output: {
       title: checkName,
       summary: `${annotations.length} errors(s) found`,
@@ -86,6 +79,9 @@ async function run() {
     const flake8Output = await runFlake8();
     const annotations = parseOutput(flake8Output);
     await createCheck(annotations);
+    if (annotations.length > 0) {
+      core.setFailed('flake8 failures found');
+    }
   }
   catch (error) {
     core.setFailed(error.message);
