@@ -23,6 +23,7 @@ async function runFlake8() {
   return myOutput;
 }
 
+// Regex the output for error lines, then format them in
 function parseOutput(output) {
   // Group 0: whole match
   // Group 1: filename
@@ -52,26 +53,24 @@ function parseOutput(output) {
       annotations.push(match);
     }
   }
-
-  const any_matches = annotations.length > 0;
-  return {
-    conclusion: any_matches ? 'failure' : 'success',
-    output: {
-      title: checkName,
-      summary: `${annotations.length} error(s) found`,
-      annotations: annotations,
-    },
-  };
+  return annotations;
 }
 
-async function createCheck(checkData) {
+async function createCheck(annotations) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
+  core.setFailed('flake8 failures found');
+
   await octokit.checks.create({
     ...github.context.repo,
     name: checkName,
     head_sha: github.context.sha,
     status: 'completed',
-    ...checkData
+    conclusion: annotations.length > 0 ? 'failure' : 'success',
+    output: {
+      title: checkName,
+      summary: `${annotations.length} errors(s) found`,
+      annotations
+    }
   });
 }
 
@@ -79,13 +78,8 @@ async function createCheck(checkData) {
 async function run() {
   try {
     const flake8Output = await runFlake8();
-    const checkData = parseOutput(flake8Output);
-    console.log(checkData);
-    await createCheck(checkData);
-    if (checkData.conclusion === 'failure') {
-      core.setFailed('flake8 failures found');
-    }
-    core.setFailed('flake8 failures found');
+    const annotations = parseOutput(flake8Output);
+    await createCheck(annotations);
   }
   catch (error) {
     core.setFailed(error.message);
