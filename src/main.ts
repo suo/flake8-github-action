@@ -47,14 +47,13 @@ function parseFlake8Output(output) {
       annotations.push(match);
     }
   }
-  console.log(annotations);
   return annotations;
 }
 
 async function createCheck(checkName, annotations) {
   const octokit = new github.GitHub(String(GITHUB_TOKEN));
 
-  await octokit.checks.create({
+  const res = await octokit.checks.create({
     ...github.context.repo,
     name: checkName,
     head_sha: github.context.sha,
@@ -66,6 +65,8 @@ async function createCheck(checkName, annotations) {
       annotations
     }
   });
+
+  console.log(res);
 }
 
 
@@ -74,6 +75,7 @@ async function run() {
     // Launch flake8
     const flake8Output = await runFlake8();
     const annotations = parseFlake8Output(flake8Output);
+    console.log(annotations);
     await createCheck("flake8 lint", annotations);
 
     // Launch clangtidy
