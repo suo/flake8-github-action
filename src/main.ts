@@ -1,9 +1,8 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
-import * as io from '@actions/io';
 
-const { GITHUB_TOKEN, GITHUB_WORKSPACE } = process.env;
+const { GITHUB_TOKEN } = process.env;
 const checkName = "flake8 lint"
 
 async function runFlake8() {
@@ -22,7 +21,7 @@ async function runFlake8() {
           }
       }
   };
-  await exec.exec('flake8', ['--exit-zero']);
+  await exec.exec('flake8', ['--exit-zero'], options);
   return myOutput;
 }
 
@@ -79,7 +78,6 @@ async function createCheck(checkData) {
 
 async function run() {
   try {
-      const myInput = core.getInput('myInput');
       const flake8Output = await runFlake8();
       const checkData = parseOutput(flake8Output);
       console.log(checkData);
