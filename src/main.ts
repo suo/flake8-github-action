@@ -47,6 +47,7 @@ function parseFlake8Output(output) {
       annotations.push(match);
     }
   }
+  console.log(annotations);
   return annotations;
 }
 
