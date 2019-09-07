@@ -74,6 +74,7 @@ async function createCheck(checkName, annotations) {
 async function run() {
   try {
     console.log(`github sha: ${github.context.sha}`);
+    console.log(`github ref: ${github.context.ref}`);
     console.log(`github event name: ${GITHUB_EVENT_NAME}`)
     // Launch flake8
     const flake8Output = await runFlake8();
