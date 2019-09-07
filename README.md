@@ -2,6 +2,8 @@
 
 This is a Github Action to run `flake8` against your repository. It uses the new Github Actions API and JavaScript toolkit. It does fancy things like add annotations to your PRs inline.
 
+![image](docs/image.png)
+
 Use it in your project like:
 
 (in `.github/workflows/lint.yml`)
