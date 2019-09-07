@@ -5,8 +5,6 @@ import * as github from '@actions/github';
 const { GITHUB_TOKEN } = process.env;
 
 async function runFlake8() {
-  await exec.exec('pip3 install flake8');
-
   let myOutput = '';
   let options = {
     listeners: {
