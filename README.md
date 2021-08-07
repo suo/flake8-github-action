@@ -7,7 +7,7 @@ This is a Github Action to run `flake8` against your repository. It uses the new
 Use it in your project like:
 
 (in `.github/workflows/lint.yml`)
-```
+```yaml
 name: Lint
 
 on:
